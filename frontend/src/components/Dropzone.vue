@@ -12,6 +12,7 @@
 import Dropzone from 'dropzone'
 import '../../node_modules/dropzone/dist/dropzone.css'
 import lambda from '../lambda'
+// import aws from '../aws'
 
 Dropzone.autoDiscover = false
 
@@ -50,17 +51,19 @@ export default {
       // We're going to process each file manually (see `accept` below)
       autoProcessQueue: false,
 
-      // Here we request a signed upload URL when a file being accepted
       accept (file, done) {
         lambda.getSignedURL(file)
           .then((url) => {
+            console.log('made it here')
+            console.log(url)
             file.uploadURL = url
             done()
             // Manually process each file
             setTimeout(() => vm.dropzone.processFile(file))
           })
           .catch((err) => {
-            done('Failed to get an S3 signed upload URL', err)
+            done('Failed to upload file to S3', err)
+            console.log(err)
           })
       }
     }

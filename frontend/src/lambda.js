@@ -8,6 +8,7 @@ export default {
       filePath: file.name,
       contentType: file.type
     }
+    console.log(payload)
     return axios.post(endpoint, payload)
       .then((res) => {
         return Promise.resolve(res.data.url || '/')

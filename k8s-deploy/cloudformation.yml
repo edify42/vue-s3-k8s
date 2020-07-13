@@ -1,0 +1,68 @@
+Parameters:
+  Environment:
+    Type: String
+    Description: >
+      Environment for IAM configuration for pods to assume roles.
+    Default: development
+    AllowedValues:
+      - development
+      - staging
+      - production
+  ServiceAccount:
+    Type: String
+    Description: >
+      k8s service account which will map to this AWS IAM role.
+    Default: "system:serviceaccount:*"
+  MasterARN:
+    Type : 'AWS::SSM::Parameter::Value<String>'
+    Default: /platform/eks/master-arn
+  MasterOIDC:
+    Type : 'AWS::SSM::Parameter::Value<String>'
+    Default: /platform/eks/master-oidc-condition
+  MasterURL:
+    Type : 'AWS::SSM::Parameter::Value<String>'
+    Default: /platform/eks/master-url
+
+Mappings:
+  environment:
+    development:
+      AccountID: 702880128631
+    staging:
+      AccountID: 106772905355
+    production:
+      AccountID: 362442693667
+
+Resources:
+  PodRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal:
+              Federated:
+                - !Ref MasterARN
+            Condition:
+              StringLike:
+                oidc.eks.ap-southeast-2.amazonaws.com/id/EE7DB7375C7DDFCBE2D38E26D32437DB:sub: !Ref ServiceAccount
+            Action:
+              - "sts:AssumeRoleWithWebIdentity"
+      Policies:
+        - PolicyName: "PodPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "s3:*"
+                Resource: "arn:aws:s3:::lendi-hello-quick-demo-development"
+              - Effect: Allow
+                Action:
+                  - "s3:*"
+                Resource: "arn:aws:s3:::lendi-hello-quick-demo-development/*"
+
+Outputs:
+  RoleArn:
+    Value: !GetAtt [ 'PodRole', 'Arn']

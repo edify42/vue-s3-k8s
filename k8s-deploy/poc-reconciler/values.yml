@@ -1,0 +1,68 @@
+# Default values for kapp - these values will be overriden by `lcd`
+appVersion: 2.0.0
+team: platform
+project: hello-kapp
+tag: latest
+environment: development
+domain: lendi-paas-dev.net
+
+replicaCount: 1
+access: public
+
+containers:
+  - name: poc
+    image: tedk42/vue-s3-dropzone:k8s
+    port: 8080
+    # Use the block below to indicate which ingress hostname routes the app should receive traffic from
+    alternateHostnames:
+      - k8s-reconciler-poc.lendi-paas-dev.net
+    healthCheck:
+      exec:
+        command:
+          - ls
+          - -l
+          - /tmp
+      initialDelaySeconds: 5
+      periodSeconds: 5
+    environment:
+      something: good
+
+image:
+  pullPolicy: Always
+
+serviceAccount:
+  arn: "none"
+
+podSecurityContext: 
+  fsGroup: 2000
+
+securityContext:
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  type: nginx
+  annotations:
+    # A few ingress classes might need to be supported
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/server-alias: '' # Useful for additional hostname fields
+
+resources:
+  limits:
+    cpu: 600m
+    memory: 256Mi
+  requests:
+    cpu: 200m
+    memory: 256Mi
+
+nodeSelector: {}
+
+tolerations: []

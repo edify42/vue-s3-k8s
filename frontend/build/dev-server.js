@@ -4,9 +4,11 @@ if (!process.env.NODE_ENV) process.env.NODE_ENV = JSON.parse(config.dev.env.NODE
 var path = require('path')
 var express = require('express')
 var webpack = require('webpack')
+const bodyParser = require('body-parser');
 var opn = require('opn')
 var proxyMiddleware = require('http-proxy-middleware')
 var webpackConfig = require('./webpack.dev.conf')
+var AWS = require('aws-sdk')
 
 // default port where dev server listens for incoming traffic
 var port = process.env.PORT || config.dev.port
@@ -15,6 +17,32 @@ var port = process.env.PORT || config.dev.port
 var proxyTable = config.dev.proxyTable
 
 var app = express()
+app.use(bodyParser.json())
+app.post('/lambda', function (req, res) {
+  let prefix = process.env.BUCKET_PREFIX || 'uploads/test'
+  let Bucket = process.env.BUCKET || 'lendi-hello-quick-demo-development' // 'lendi-assets-2020-development'
+  console.log('my body')
+  console.log(req.body)
+  let payload = req.body
+  var params = {
+    Bucket,
+    Key: `${prefix}/${payload.filePath}`,
+    Expires: 3600,
+    ContentType: payload.contentType
+  }
+  let s3 = new AWS.S3({apiVersion: '2006-03-01'})
+
+  console.log(params)
+
+  s3.getSignedUrl('putObject', params, (err, url) => {
+    if (err) {
+      return new Error(err)
+    } else {
+      res.send({url})
+      // res.send('hello, world!')
+    }
+  })
+})
 var compiler = webpack(webpackConfig)
 
 var devMiddleware = require('webpack-dev-middleware')(compiler, {
@@ -67,6 +95,7 @@ module.exports = app.listen(port, function (err) {
 
   // when env is testing, don't need open it
   if (process.env.NODE_ENV !== 'testing') {
-    opn(uri)
+    // opn(uri)
+    console.log('was gonna open lol')
   }
 })
