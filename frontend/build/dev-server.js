@@ -27,9 +27,17 @@ app.post('/lambda', function (req, res) {
   var params = {
     Bucket,
     Key: `${prefix}/${payload.filePath}`,
-    Expires: 3600,
+    Expires: 600,
     ContentType: payload.contentType
   }
+  let whoami = new AWS.STS()
+  whoami.getCallerIdentity({},(err, resp) => {
+    if (err) {
+      console.log("Error", err);
+   } else {
+      console.log(JSON.stringify(resp.Arn));
+   }
+  })
   let s3 = new AWS.S3({apiVersion: '2006-03-01'})
 
   console.log(params)

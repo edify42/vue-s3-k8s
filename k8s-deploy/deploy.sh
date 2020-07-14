@@ -48,7 +48,7 @@ helm repo update
 NAME="platform-$product"
 RELEASE_NAME="$NAME-$environment"
 NAMESPACE="$NAME-$environment"
-SERVICE_ACCOUNT="system:serviceaccount:${NAMESPACE}:${RELEASE_NAME}"
+SERVICE_ACCOUNT="system:serviceaccount:${NAMESPACE}:${RELEASE_NAME}-kapp"
 
 # lcd upgrade is a WIP. For now, we'll create the role via ltd
 ltd provision --environment "${environment}" --stack-name "k8s-${NAME}" \
