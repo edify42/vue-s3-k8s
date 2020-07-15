@@ -11,7 +11,7 @@ access: public
 
 containers:
   - name: poc
-    image: tedk42/vue-s3-dropzone:k8s-3
+    image: tedk42/vue-s3-dropzone:k8s-4
     port: 8080
     # Use the block below to indicate which ingress hostname routes the app should receive traffic from
     alternateHostnames:
@@ -53,7 +53,6 @@ ingress:
   annotations:
     # A few ingress classes might need to be supported
     kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/server-alias: '' # Useful for additional hostname fields
     nginx.ingress.kubernetes.io/auth-signin: https://$host/oauth2/start?rd=$escaped_request_uri
     nginx.ingress.kubernetes.io/auth-url: https://$host/oauth2/auth
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"

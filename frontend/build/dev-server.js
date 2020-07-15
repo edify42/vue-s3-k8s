@@ -4,8 +4,7 @@ if (!process.env.NODE_ENV) process.env.NODE_ENV = JSON.parse(config.dev.env.NODE
 var path = require('path')
 var express = require('express')
 var webpack = require('webpack')
-const bodyParser = require('body-parser');
-var opn = require('opn')
+const bodyParser = require('body-parser')
 var proxyMiddleware = require('http-proxy-middleware')
 var webpackConfig = require('./webpack.dev.conf')
 var AWS = require('aws-sdk')
@@ -31,12 +30,12 @@ app.post('/lambda', function (req, res) {
     ContentType: payload.contentType
   }
   let whoami = new AWS.STS()
-  whoami.getCallerIdentity({},(err, resp) => {
+  whoami.getCallerIdentity({}, (err, resp) => {
     if (err) {
-      console.log("Error", err);
-   } else {
-      console.log(JSON.stringify(resp.Arn));
-   }
+      console.log("Error", err)
+    } else {
+      console.log(JSON.stringify(resp.Arn))
+    }
   })
   let s3 = new AWS.S3({apiVersion: '2006-03-01'})
 
