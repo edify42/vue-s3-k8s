@@ -6,6 +6,26 @@ var path = require('path')
 // default port where dev server listens for incoming traffic
 var port = process.env.PORT || 8080
 
+// Prometheus metrics
+const client = require('prom-client')
+const collectDefaultMetrics = client.collectDefaultMetrics
+const Registry = client.Registry
+const register = new Registry()
+collectDefaultMetrics({ register })
+
+// lambda counters
+const countS3Success = new client.Counter({
+  name: 'count_signed_url_success',
+  help: 'all the successful pre-signed url requests returned from AWS'
+})
+const countS3Failed = new client.Counter({
+  name: 'count_signed_url_failed',
+  help: 'all the failed pre-signed url requests returned from AWS'
+})
+
+register.registerMetric(countS3Success)
+register.registerMetric(countS3Failed)
+
 var app = express()
 app.use(bodyParser.json())
 app.post('/lambda', function (req, res) {
@@ -21,7 +41,7 @@ app.post('/lambda', function (req, res) {
   let whoami = new AWS.STS()
   whoami.getCallerIdentity({}, (err, resp) => {
     if (err) {
-      console.log("Error", err)
+      console.log('Error', err)
     } else {
       console.log(JSON.stringify(resp.Arn))
     }
@@ -32,8 +52,10 @@ app.post('/lambda', function (req, res) {
 
   s3.getSignedUrl('putObject', params, (err, url) => {
     if (err) {
+      countS3Failed.inc()
       return new Error(err)
     } else {
+      countS3Success.inc()
       res.send({url})
       // res.send('hello, world!')
     }
@@ -41,6 +63,10 @@ app.post('/lambda', function (req, res) {
 })
 
 app.use('/', express.static(path.join(__dirname, '..', 'dist')))
+
+app.get('/metrics', (req, resp) => {
+  resp.send(register.metrics())
+})
 
 module.exports = app.listen(port, function (err) {
   if (err) {
