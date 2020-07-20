@@ -57,7 +57,6 @@ app.post('/lambda', function (req, res) {
     } else {
       countS3Success.inc()
       res.send({url})
-      // res.send('hello, world!')
     }
   })
 })
