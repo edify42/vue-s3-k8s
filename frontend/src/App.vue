@@ -8,7 +8,6 @@
       <p><a href="https://console.aws.amazon.com/s3/buckets/lendi-hello-quick-demo-development/uploads/test/?region=ap-southeast-2&tab=overview">Click here for the bucket</a></p>
     </div>
   </div>
-  
 </template>
 
 <script>
