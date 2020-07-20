@@ -4,8 +4,11 @@
 
 ## Overview
 
-  - A Vue.js 2.0 component wrapping [Dropzone.js](https://github.com/enyo/dropzone)
-  - Upload files to AWS S3 *serverlessly* with AWS Lambda.
+- A Vue.js 2.0 component wrapping [Dropzone.js](https://github.com/enyo/dropzone)
+- Secure backend will generate the S3 signed URL. Here we use a k8s pod which
+can assume the role to create the signed URL.
+
+This repo is based off work done here: https://github.com/kfei/vue-s3-dropzone
 
 ## Demo
 
@@ -13,31 +16,27 @@
 
 ## Quickstart
 
-Clone this repo:
+Clone this repo
 
-```
-git clone https://github.com/kfei/vue-s3-dropzone
+```bash
+git clone 
 ```
 
-This repo contains two directories: **frontend** and **lambda**. You must first
-create the AWS Lambda function and deploy it onto AWS API Gateway. Then put the
-invoke URL into `frontend/src/config.js` so that you can run and test the Vue
-powered web client by:
+This repo contains two directories: **frontend** and **k8s-deploy**. You must first build the docker container and push it.
 
-```
+The k8s-deploy scripts use lendi-specific tools to deploy the cloudformation
+stack but these can be replaced with a simple `aws cloudformation` style
+command.
+
+### Run locally
+
+```bash
 cd frontend
-yarn install
-npm run dev
+yarn
+yarn run dev
 ```
 
-Please make sure you have correct privilege/policy/CORS settings on AWS. Feel
-free to open an issue if you happened to be trapped by that. :cry:
-
-## Architecture
-
-You can have a look at the [architecture explanation](https://milkr.io/kfei/Explanation-of-vue-s3-dropzone) on Milkr.
-
-[![demo-pic](https://i.imgur.com/UHpZgy1.png)](https://milkr.io/kfei/Explanation-of-vue-s3-dropzone)
+You need the right set of AWS access keys exported to have bucket access.
 
 ## License
 
