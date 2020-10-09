@@ -80,7 +80,7 @@ export default {
 </script>
 
 <style lang="stylus">
-primaryBlue = #3498db
+primaryBlue = "#3498db"
 
 form.dropzone
   transition all 0.2s linear
